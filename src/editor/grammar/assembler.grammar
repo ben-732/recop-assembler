@@ -1,0 +1,42 @@
+
+@skip {
+  space
+}
+
+@top Program { Statement (Statement)* }
+
+@tokens {
+  hex_digit { $[0-9a-fA-F] }
+  space { " " | "\t" | "\n"}  // Ignore whitespace
+  comment { ";" ![\n]* }
+  registerNumber { $[0-7] }
+}
+
+
+Statement {
+  Command ArgList?
+}
+
+Command {
+  "MOV" | "ADD" | "SUB" | "MUL" | "DIV"
+}
+
+ArgList {
+  Arg (Arg)*
+}
+
+Arg {
+  Register | Number
+}
+
+Register {
+  "R" registerNumber
+}
+
+Number {
+  "0x" hex_digit+ 
+}
+
+
+
+
