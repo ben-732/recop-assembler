@@ -1,32 +1,19 @@
-import CodeMirror, { basicSetup } from "@uiw/react-codemirror";
-import { dracula } from "@uiw/codemirror-theme-dracula";
-import { asm } from "@/editor/language";
-import { useEffect, useState } from "react";
-import { parser } from "./editor/grammar/assembler";
+import { useMemo, useState } from "react";
+import Editor from "./components/editor";
+import Display from "./components/display";
+import { compile } from "./compiler/compiler";
 
 function App() {
-  const [value, setValue] = useState("MOV R0");
+  const [value, setValue] = useState("ADD R0 R1");
 
-  useEffect(() => {
-    const tree = parser.parse(value);
-    console.log(tree.toString());
-  }, [value]);
+  const compiled = useMemo(() => compile(value), [value]);
 
   return (
     <div className="h-screen w-screen bg-gray-900 p-4">
-      <h1 className="text-white font-bold  text-xl">ReCOP Assembler</h1>
+      <h1 className="text-white font-bold text-xl">ReCOP Assembler</h1>
 
-      <div className="p-4 max-w-7xl">
-        <CodeMirror
-          theme={dracula}
-          height="400px"
-          extensions={[basicSetup(), asm()]}
-          value={value}
-          onChange={(value) => {
-            setValue(value);
-          }}
-        />
-      </div>
+      <Editor value={value} setValue={setValue} />
+      <Display lines={compiled} />
     </div>
   );
 }

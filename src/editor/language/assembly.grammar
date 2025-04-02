@@ -18,7 +18,7 @@ Statement {
 }
 
 Command {
-  "MOV" | "ADD" | "SUB" | "MUL" | "DIV"
+ "LDR" | "STR" | "JMP" | "PRESENT" | "AND" | "OR" | "ADD" | "SUB" | "SUBV" | "CLFZ" | "CER" | "CEOT" | "SEOT" | "NOOP" | "SZ" | "LER" | "SSVOP" | "SSOP" | "LSIP" | "DATACALL" | "DATACALL2" | "MAX" | "STRPC" | "SRES"
 }
 
 ArgList {
