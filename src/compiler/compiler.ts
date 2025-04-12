@@ -2,17 +2,21 @@ import { Instruction, InstructionPartKey } from "./instruction";
 import { AssemblyLine } from "./assembly-line";
 import { parseCommand } from "./opcodes";
 
-export function compile(input: string): Instruction[] {
+type Line = { value: string; line: number };
+type InstructionOrString = Instruction | string;
+export type Compiled = { line: number; output: InstructionOrString };
+
+export function compile(input: string): Compiled[] {
   const lines = input
     .split("\n")
-    .map((line) => line.trim())
-    .filter((line) => line && line.length > 0);
+    .map<Line>((line, i) => ({ line: i + 1, value: line.trim() }))
+    .filter((line) => line.value && line.value.length > 0);
 
-  const instructions: Instruction[] = [];
+  const instructions: Compiled[] = [];
 
   for (const line of lines) {
     try {
-      const asmLine = new AssemblyLine(line);
+      const asmLine = new AssemblyLine(line.value);
       // console.log(getOpCode(parts[0].toUpperCase()));
 
       const command = parseCommand(asmLine.getCommand());
@@ -32,10 +36,15 @@ export function compile(input: string): Instruction[] {
 
       // Set Address Mode to Immediate
 
-      instructions.push(instruction);
+      instructions.push({
+        line: line.line,
+        output: instruction,
+      });
     } catch (error) {
-      console.error(`Error parsing line "${line}": ${error}}`);
-      console.log(error);
+      instructions.push({
+        line: line.line,
+        output: `${error}`.replace("\n", " "),
+      });
       continue;
     }
   }
