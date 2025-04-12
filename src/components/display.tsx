@@ -1,6 +1,4 @@
 import { Compiled } from "@/compiler/compiler";
-import { Instruction } from "@/compiler/instruction";
-import React from "react";
 
 interface DisplayProps {
   lines: Compiled[];
