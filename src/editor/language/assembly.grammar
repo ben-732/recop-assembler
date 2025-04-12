@@ -1,32 +1,35 @@
-
 @skip {
-  space
+  space | comment
 }
 
-@top Program { Statement (Statement)* }
+@top Program {
+  Statement (Statement)*
+}
 
 @tokens {
   hex_digit { $[0-9a-fA-F] }
-  space { " " | "\t" | "\n"}  // Ignore whitespace
+  space { " " | "\t" | "\n" }
   comment { ";" ![\n]* }
   registerNumber { $[0-7] }
+  label_char { $[\w] }
 }
 
-
 Statement {
-  Command ArgList?
+  Command Arg+
 }
 
 Command {
- "LDR" | "STR" | "JMP" | "PRESENT" | "AND" | "OR" | "ADD" | "SUB" | "SUBV" | "CLFZ" | "CER" | "CEOT" | "SEOT" | "NOOP" | "SZ" | "LER" | "SSVOP" | "SSOP" | "LSIP" | "DATACALL" | "DATACALL2" | "MAX" | "STRPC" | "SRES"
+  "LDR" | "STR" | "STRPC" | "JMP" | "PRESENT" | "AND" | "OR" | "ADD" | "SUB" | "SUBV" |
+  "CLFZ" | "CER" | "CEOT" | "SEOT" | "NOOP" | "SZ" | "LER" | "SSVOP" | "SSOP" |
+  "LSIP" | "DATACALL" | "DATACALL2" | "MAX"
 }
 
 ArgList {
-  Arg (Arg)*
+  Arg+
 }
 
 Arg {
-  Register | Number
+  Register | Number | Operand
 }
 
 Register {
@@ -34,9 +37,13 @@ Register {
 }
 
 Number {
-  "0x" hex_digit+ 
+  "#" hex_digit+
 }
 
+Operand {
+ "$" hex_digit+
+}
 
-
-
+Label {
+  "--" label_char+
+}

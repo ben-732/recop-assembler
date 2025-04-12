@@ -4,7 +4,9 @@ import Display from "./components/display";
 import { compile } from "./compiler/compiler";
 
 function App() {
-  const [value, setValue] = useState("ADD R0 R1");
+  const [value, setValue] = useState(
+    "ADD R0 R0 R2\nLDR R3 $a1b2\nLDR R4 #c3d4 "
+  );
 
   const compiled = useMemo(() => compile(value), [value]);
 

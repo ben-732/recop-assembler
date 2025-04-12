@@ -1,20 +1,26 @@
 import { AddressMode } from "./address-modes";
 import { InstructionParts, shift } from "./instruction";
 
+export type ArgumentType = "RegisterX" | "RegisterZ" | "Number" | "Address";
+
 const opcode = InstructionParts.OP;
 
-export interface OpCode {
+export interface Command {
   value: number;
-  modes: AddressMode[];
+  modes: Partial<Record<AddressMode, Array<ArgumentType>>>;
 }
 
 /**
  * Get the opcode for a given instruction. If the instruction is not found, return undefined.
  */
-export function getOpCode(value: string) {
-  const opcode = opcodes[value.toUpperCase()];
+export function parseCommand(value: string): Command {
+  if (value.length === 0) {
+    throw new Error("Empty Command");
+  }
+
+  const opcode = commands[value.toUpperCase() as Opcode];
   if (!opcode) {
-    return undefined;
+    throw new Error(`Unknown Command: ${value}`);
   }
 
   return opcode;
@@ -24,227 +30,193 @@ function shiftCode(value: number) {
   return shift(opcode, value);
 }
 
-export const opcodes: Record<string, OpCode> = {
-  /**
-   * LDR - Load Register
-   * - intermediate: `LDR Rz #value`
-   * - indirect: `LDR Rz $address`
-   * - direct: `LDR Rz Rx`
-   */
-  ["LDR"]: {
-    value: shiftCode(0b000000),
-    modes: [AddressMode.Immediate, AddressMode.Register, AddressMode.Direct],
-  },
+export const opcodes = [
+  "LDR",
+  "STR",
+  "JMP",
+  "PRESENT",
+  "AND",
+  "OR",
+  "ADD",
+  "SUB",
+  "SUBV",
+  "CLFZ",
+  "CER",
+  "CEOT",
+  "SEOT",
+  "NOOP",
+  "SZ",
+  "LER",
+  "SSVOP",
+  "SSOP",
+  "LSIP",
+  "DATACALL",
+  "MAX",
+  "STRPC",
+] as const;
+export type Opcode = (typeof opcodes)[number];
 
-  /**
-   * STR - Store Register
-   * - immediate: `STR Rz #value`
-   * - indirect: `STR Rz Rx`
-   * - direct: `STR Rx Op`
-   */
-  ["STR"]: {
-    value: shiftCode(0b000010),
-    modes: [AddressMode.Immediate, AddressMode.Register, AddressMode.Direct],
-  },
-
-  /**
-   * JMP - Jump
-   * - immediate: `JMP #address`
-   * - direct: `JMP Rx`
-   */
-  ["JMP"]: {
-    value: shiftCode(0b011000),
-    modes: [AddressMode.Immediate, AddressMode.Direct],
-  },
-
-  /**
-   * PRESENT - Jump to address location if the thread pointed to by Rz is not present else continue execution
-   * - direct: `PRESENT Rz Rx`
-   */
-  ["PRESENT"]: {
-    value: shiftCode(0b011100),
-    modes: [AddressMode.Direct],
-  },
-
-  /**
-   * AND - Logical AND
-   * - direct: `AND Rz Rx Op`
-   */
+export const commands = {
   ["AND"]: {
     value: shiftCode(0b001000),
-    modes: [AddressMode.Direct],
+    modes: {
+      [AddressMode.Register]: ["RegisterZ", "RegisterZ", "RegisterX"],
+      [AddressMode.Immediate]: ["RegisterZ", "RegisterX", "Number"],
+    },
   },
 
-  /**
-   * OR - Logical OR
-   * - direct: `OR Rz Rx Op`
-   */
   ["OR"]: {
     value: shiftCode(0b001100),
-    modes: [AddressMode.Direct],
+    modes: {
+      [AddressMode.Register]: ["RegisterZ", "RegisterZ", "RegisterX"],
+      [AddressMode.Immediate]: ["RegisterZ", "RegisterX", "Number"],
+    },
   },
 
-  /**
-   * ADD - Addition
-   * - direct: `ADD Rz Rx Op`
-   */
   ["ADD"]: {
     value: shiftCode(0b111000),
-    modes: [AddressMode.Direct],
+    modes: {
+      [AddressMode.Register]: ["RegisterZ", "RegisterZ", "RegisterX"],
+      [AddressMode.Immediate]: ["RegisterZ", "RegisterX", "Number"],
+    },
   },
 
-  /**
-   * SUB - Subtraction
-   * - direct: `SUB Rz Op`
-   */
-  ["SUB"]: {
-    value: shiftCode(0b000100),
-    modes: [AddressMode.Direct],
-  },
-
-  /**
-   * SUBV - Subtraction with Overflow
-   * - direct: `SUBV Rz Rx Op`
-   */
   ["SUBV"]: {
     value: shiftCode(0b000011),
-    modes: [AddressMode.Direct],
+    modes: {
+      [AddressMode.Immediate]: ["RegisterZ", "RegisterX", "Number"],
+    },
   },
 
-  /**
-   * CLFZ - Clear Flags
-   * - inherent: `CLFZ`
-   */
-  ["CLFZ"]: {
-    value: shiftCode(0b010000),
-    modes: [AddressMode.Inherent],
+  ["SUB"]: {
+    value: shiftCode(0b000100),
+    modes: {
+      [AddressMode.Immediate]: ["RegisterZ", "Number"],
+    },
   },
 
-  /**
-   * CER - Clear Error
-   * - inherent: `CER`
-   */
-  ["CER"]: {
-    value: shiftCode(0b111100),
-    modes: [AddressMode.Inherent],
+  ["LDR"]: {
+    value: shiftCode(0b000000),
+    modes: {
+      [AddressMode.Immediate]: ["RegisterZ", "Number"],
+      [AddressMode.Register]: ["RegisterZ", "RegisterX"],
+      [AddressMode.Direct]: ["RegisterZ", "Address"],
+    },
   },
 
-  /**
-   * CEOT - Clear End of Transmission
-   * - inherent: `CEOT`
-   */
-  ["CEOT"]: {
-    value: shiftCode(0b111110),
-    modes: [AddressMode.Inherent],
+  ["STR"]: {
+    value: shiftCode(0b000010),
+    modes: {
+      [AddressMode.Immediate]: ["RegisterZ", "Number"],
+      [AddressMode.Register]: ["RegisterZ", "RegisterX"],
+      [AddressMode.Direct]: ["RegisterX", "Address"],
+    },
   },
 
-  /**
-   * SEOT - Set End of Transmission
-   * - inherent: `SEOT`
-   */
-  ["SEOT"]: {
-    value: shiftCode(0b111111),
-    modes: [AddressMode.Inherent],
+  ["JMP"]: {
+    value: shiftCode(0b011000),
+    modes: {
+      [AddressMode.Immediate]: ["Number"],
+      [AddressMode.Direct]: ["RegisterX"],
+    },
   },
 
-  /**
-   * NOOP - No Operation
-   * - inherent: `NOOP`
-   */
-  ["NOOP"]: {
-    value: shiftCode(0b110100),
-    modes: [AddressMode.Inherent],
+  ["PRESENT"]: {
+    value: shiftCode(0b011100),
+    modes: {
+      [AddressMode.Immediate]: ["RegisterZ", "Number"],
+    },
   },
 
-  /**
-   * SZ - Set Zero
-   * - immediate: `SZ Op`
-   */
-  ["SZ"]: {
-    value: shiftCode(0b010100),
-    modes: [AddressMode.Immediate],
-  },
-
-  /**
-   * LER - Load Error Register
-   * - direct: `LER Rz`
-   */
-  ["LER"]: {
-    value: shiftCode(0b110110),
-    modes: [AddressMode.Direct],
-  },
-
-  /**
-   * SSVOP - Set Special Value Operation
-   * - direct: `SSVOP Rx`
-   */
-  ["SSVOP"]: {
-    value: shiftCode(0b111011),
-    modes: [AddressMode.Direct],
-  },
-
-  /**
-   * SSOP - Set Special Operation
-   * - direct: `SSOP Rx`
-   */
-  ["SSOP"]: {
-    value: shiftCode(0b111010),
-    modes: [AddressMode.Direct],
-  },
-
-  /**
-   * LSIP - Load Special Instruction Pointer
-   * - direct: `LSIP Rx`
-   */
-  ["LSIP"]: {
-    value: shiftCode(0b110111),
-    modes: [AddressMode.Direct],
-  },
-
-  /**
-   * DATACALL - Data Call
-   * - register: `DATACALL Rx`
-   * - immediate: `DATACALL Rx #value`
-   */
   ["DATACALL"]: {
     value: shiftCode(0b101000),
-    modes: [AddressMode.Register, AddressMode.Immediate],
+    modes: {
+      [AddressMode.Register]: ["RegisterX"],
+      [AddressMode.Immediate]: ["RegisterX", "Number"],
+    },
   },
 
-  /**
-   * DATACALL2 - Data Call Variant
-   * - register: `DATACALL2 Rx`
-   * - immediate: `DATACALL2 Rx #value`
-   */
-  ["DATACALL2"]: {
-    value: shiftCode(0b101001),
-    modes: [AddressMode.Register, AddressMode.Immediate],
+  ["SZ"]: {
+    value: shiftCode(0b010100),
+    modes: {
+      [AddressMode.Immediate]: ["Number"],
+    },
   },
 
-  /**
-   * MAX - Maximum
-   * - immediate: `MAX Rz #value`
-   */
+  ["CLFZ"]: {
+    value: shiftCode(0b010000),
+    modes: {
+      [AddressMode.Inherent]: [],
+    },
+  },
+
+  ["CER"]: {
+    value: shiftCode(0b111100),
+    modes: {
+      [AddressMode.Inherent]: [],
+    },
+  },
+
+  ["CEOT"]: {
+    value: shiftCode(0b111110),
+    modes: {
+      [AddressMode.Inherent]: [],
+    },
+  },
+
+  ["SEOT"]: {
+    value: shiftCode(0b111111),
+    modes: {
+      [AddressMode.Inherent]: [],
+    },
+  },
+
+  ["LER"]: {
+    value: shiftCode(0b110110),
+    modes: {
+      [AddressMode.Register]: ["RegisterZ"],
+    },
+  },
+
+  ["SSVOP"]: {
+    value: shiftCode(0b111011),
+    modes: {
+      [AddressMode.Register]: ["RegisterX"],
+    },
+  },
+
+  ["LSIP"]: {
+    value: shiftCode(0b110111),
+    modes: {
+      [AddressMode.Register]: ["RegisterZ"],
+    },
+  },
+
+  ["SSOP"]: {
+    value: shiftCode(0b111010),
+    modes: {
+      [AddressMode.Register]: ["RegisterX"],
+    },
+  },
+
+  ["NOOP"]: {
+    value: shiftCode(0b110100),
+    modes: {
+      [AddressMode.Inherent]: [],
+    },
+  },
+
   ["MAX"]: {
     value: shiftCode(0b011110),
-    modes: [AddressMode.Immediate],
+    modes: {
+      [AddressMode.Immediate]: ["RegisterZ", "Number"],
+    },
   },
 
-  /**
-   * STRPC - Store Program Counter
-   * - direct: `STRPC Rz $address`
-   */
   ["STRPC"]: {
     value: shiftCode(0b011101),
-    modes: [AddressMode.Direct],
+    modes: {
+      [AddressMode.Direct]: ["Address"], // `$address`
+    },
   },
-
-  /**
-   * SRES - Set Reset
-   * - register: `SRES Rz`
-   */
-  ["SRES"]: {
-    value: shiftCode(0b101010),
-    modes: [AddressMode.Register],
-  },
-};
+} satisfies Record<Opcode, Command>;

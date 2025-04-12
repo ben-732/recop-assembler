@@ -1,6 +1,7 @@
 import CodeMirror, { basicSetup } from "@uiw/react-codemirror";
 import { dracula } from "@uiw/codemirror-theme-dracula";
-import { asm } from "@/editor/language";
+import { asm, asmLanguage } from "@/editor/language";
+import { useEffect } from "react";
 
 interface Props {
   value: string;
@@ -8,6 +9,13 @@ interface Props {
 }
 
 function Editor({ value, setValue }: Props) {
+  // console.log(dracula);
+
+  useEffect(() => {
+    // console.log("Parsing value:", value);
+    // console.log(asmLanguage.parser.parse(value).toString());
+  }, [value]);
+
   return (
     <div className="p-4 max-w-7xl">
       <CodeMirror

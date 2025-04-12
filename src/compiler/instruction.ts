@@ -4,13 +4,11 @@
  *
  * `| AM(2) | OP(6) | Rz(4) | Rx(4) | ADDR/VAL/OTHERs(16) |`
  */
-export class Instruction extends Number {
-  constructor(value: number) {
-    super(value);
-  }
+export class Instruction {
+  constructor(private value: number = 0) {}
 
   toHexString(pretty = true): string {
-    const str = this.toString(16).padStart(2, "0");
+    const str = this.value.toString(16).padStart(2, "0");
 
     if (!pretty) {
       return str;
@@ -21,7 +19,7 @@ export class Instruction extends Number {
   }
 
   toBinaryString(pretty = true): string {
-    const str = this.toString(2).padStart(32, "0");
+    const str = this.value.toString(2).padStart(32, "0");
 
     if (!pretty) {
       return str;
@@ -29,6 +27,23 @@ export class Instruction extends Number {
 
     const bytes = str.match(/.{1,8}/g) || [];
     return bytes.map((byte) => byte.padStart(8, "0")).join(" ");
+  }
+
+  getPart(part: InstructionPart): number {
+    return (this.value & part.mask) >> part.shift;
+  }
+
+  setPart(partKey: InstructionPartKey, value: number): void {
+    const part = InstructionParts[partKey];
+
+    if (!part) {
+      throw new Error(`Invalid instruction part: ${partKey}`);
+    }
+
+    const mask = part.mask;
+    const shiftedValue = value << part.shift;
+
+    this.value = ((this.value & ~mask) | shiftedValue) >>> 0;
   }
 }
 
@@ -42,33 +57,41 @@ export interface InstructionPart {
   readonly mask: number;
 }
 
+export enum InstructionPartKey {
+  AddressMode = "AM",
+  OpCode = "OP",
+  RegisterZ = "Rz",
+  RegisterX = "Rx",
+  Operand = "Other",
+}
+
 export const InstructionParts: Record<string, InstructionPart> = {
   /** Address Mode */
-  AM: {
+  [InstructionPartKey.AddressMode]: {
     size: 2,
     shift: 30,
     mask: 0b11 << 30,
   },
   /** OpCode */
-  OP: {
+  [InstructionPartKey.OpCode]: {
     size: 6,
     shift: 25,
     mask: 0b111111 << 25,
   },
   /** Register Z */
-  Rz: {
+  [InstructionPartKey.RegisterZ]: {
     size: 4,
-    shift: 21,
-    mask: 0b1111 << 21,
+    shift: 20,
+    mask: 0b1111 << 20,
   },
   /** Register X */
-  Rx: {
+  [InstructionPartKey.RegisterX]: {
     size: 4,
-    shift: 17,
-    mask: 0b1111 << 17,
+    shift: 16,
+    mask: 0b1111 << 16,
   },
   /** Address/Value/Other */
-  Other: {
+  [InstructionPartKey.Operand]: {
     size: 16,
     shift: 0,
     mask: 0b1111111111111111,

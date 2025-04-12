@@ -3,7 +3,7 @@ export const
   Program = 1,
   Statement = 2,
   Command = 3,
-  ArgList = 4,
-  Arg = 5,
-  Register = 6,
-  Number = 7
+  Arg = 4,
+  Register = 5,
+  Number = 6,
+  Operand = 7

@@ -1,9 +1,8 @@
-import { Instruction } from "./instruction";
-import { getOpCode } from "./opcodes";
+import { Instruction, InstructionPartKey } from "./instruction";
+import { AssemblyLine } from "./assembly-line";
+import { parseCommand } from "./opcodes";
 
 export function compile(input: string): Instruction[] {
-  console.log(input);
-
   const lines = input
     .split("\n")
     .map((line) => line.trim())
@@ -12,16 +11,33 @@ export function compile(input: string): Instruction[] {
   const instructions: Instruction[] = [];
 
   for (const line of lines) {
-    const parts = line
-      .split(" ")
-      .map((part) => part.trim())
-      .filter((part) => part.length > 0);
+    try {
+      const asmLine = new AssemblyLine(line);
+      // console.log(getOpCode(parts[0].toUpperCase()));
 
-    console.log(getOpCode(parts[0].toUpperCase()));
+      const command = parseCommand(asmLine.getCommand());
 
-    const opcode = getOpCode(parts[0].toUpperCase());
+      const instruction = new Instruction(command.value);
 
-    instructions.push(new Instruction(opcode?.value ?? -1));
+      const parts = asmLine.parseArguments(command);
+
+      for (const partKey in parts) {
+        const typedKey = partKey as InstructionPartKey;
+
+        const partValue = parts[typedKey];
+        if (partValue !== undefined) {
+          instruction.setPart(partKey as InstructionPartKey, partValue);
+        }
+      }
+
+      // Set Address Mode to Immediate
+
+      instructions.push(instruction);
+    } catch (error) {
+      console.error(`Error parsing line "${line}": ${error}}`);
+      console.log(error);
+      continue;
+    }
   }
 
   return instructions;

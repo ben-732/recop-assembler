@@ -10,13 +10,15 @@ export const asmLanguage = LRLanguage.define({
       styleTags({
         Command: tags.keyword,
         Register: tags.atom,
-        Number: tags.number,
-        ArgList: tags.meta,
-        Arg: tags.variableName,
-        Statement: tags.comment,
+        Number: tags.string,
+        Operand: tags.className,
+        Comment: tags.lineComment,
       }),
     ],
   }),
+  languageData: {
+    commentTokens: { line: ";" },
+  },
 });
 
 export function asm() {
