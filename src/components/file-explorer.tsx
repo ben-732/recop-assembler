@@ -1,7 +1,7 @@
-import { FileStore } from "@/editor/explorer.ts/file-store";
+import { FileStore } from "@/editor/explorer/file-store";
 import { useCallback, useEffect, useState } from "react";
 import { TrashIcon } from "lucide-react";
-import { IFile } from "@/editor/explorer.ts/file";
+import { IFile } from "@/editor/explorer/file";
 
 interface FileExplorerProps {
   store: FileStore;

@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import Editor from "./components/editor";
 import Display from "./components/display";
 import { compile } from "./compiler/compiler";
-import { FileStore } from "./editor/explorer.ts/file-store";
+import { FileStore } from "./editor/explorer/file-store";
 import FileExplorer from "./components/file-explorer";
 
 function App() {
