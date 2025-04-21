@@ -3,13 +3,18 @@ import { AssemblyLine } from "./assembly-line";
 import { parseCommand } from "./opcodes";
 
 type Line = { value: string; line: number };
-type InstructionOrString = Instruction | string;
-export type Compiled = { line: number; output: InstructionOrString };
+type LineError = { error: true; message: string };
+type InstructionOrError = (Instruction & { error: false }) | LineError;
+export type Compiled = { line: number; output: InstructionOrError };
 
 export function compile(input: string): Compiled[] {
   const lines = input
     .split("\n")
-    .map<Line>((line, i) => ({ line: i + 1, value: line.trim() }))
+    .map<Line>((line, i) => ({
+      error: false,
+      line: i + 1,
+      value: line.trim(),
+    }))
     .filter((line) => line.value && line.value.length > 0);
 
   const instructions: Compiled[] = [];
@@ -43,7 +48,7 @@ export function compile(input: string): Compiled[] {
     } catch (error) {
       instructions.push({
         line: line.line,
-        output: `${error}`.replace("\n", " "),
+        output: { error: true, message: `${error}`.replace("\n", " ") },
       });
       continue;
     }

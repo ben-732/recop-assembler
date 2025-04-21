@@ -5,6 +5,7 @@
  * `| AM(2) | OP(6) | Rz(4) | Rx(4) | ADDR/VAL/OTHERs(16) |`
  */
 export class Instruction {
+  public readonly error = false;
   constructor(private value: number = 0) {}
 
   toHexString(pretty = true): string {
