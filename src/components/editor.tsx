@@ -1,6 +1,6 @@
 import CodeMirror, { basicSetup } from "@uiw/react-codemirror";
 import { dracula } from "@uiw/codemirror-theme-dracula";
-import { asm, asmLanguage } from "@/editor/language";
+import { asm } from "@/editor/language";
 import { useEffect } from "react";
 
 interface Props {
@@ -17,7 +17,7 @@ function Editor({ value, setValue }: Props) {
   }, [value]);
 
   return (
-    <div className="p-4 max-w-7xl">
+    <div className="max-w-7xl">
       <CodeMirror
         height="400px"
         theme={dracula}
