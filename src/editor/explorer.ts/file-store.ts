@@ -4,7 +4,6 @@ const FILE_STORE_KEY = "file-store";
 
 export class FileStore {
   private files: Map<string, IFile> = new Map<string, IFile>();
-  // private selectedId: string | null = null;
 
   constructor(load = false) {
     this.files = new Map<string, IFile>();
@@ -20,7 +19,6 @@ export class FileStore {
   }
 
   public load() {
-    console.log("Loading files from local storage...");
     const files = localStorage.getItem(FILE_STORE_KEY) ?? "[]";
     if (files) {
       const parsedFiles = JSON.parse(files) as IFile[];
@@ -28,12 +26,9 @@ export class FileStore {
         parsedFiles.map((file) => [file.id, file])
       );
     }
-
-    console.log("Loaded files:", this.files);
   }
 
   public getFiles(): IFile[] {
-    console.log("Getting files:", this.files);
     return Array.from(this.files.values());
   }
 
@@ -42,6 +37,8 @@ export class FileStore {
     if (file) {
       file.content = content;
     }
+
+    this.save();
   }
 
   public addFile(name: string, content = ""): void {
@@ -53,5 +50,21 @@ export class FileStore {
       content,
     };
     this.files.set(id, file);
+
+    this.save();
+  }
+
+  public renameFile(id: string, name: string): void {
+    const file = this.files.get(id);
+    if (file) {
+      file.name = name;
+    }
+
+    this.save();
+  }
+
+  public deleteFile(id: string): void {
+    this.files.delete(id);
+    this.save();
   }
 }

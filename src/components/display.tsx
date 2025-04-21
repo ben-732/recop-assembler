@@ -15,7 +15,7 @@ function Display({ lines }: DisplayProps) {
         <h3 className="font-bold text-white">Hex</h3>
         <h3 className="font-bold text-white">Binary</h3>
         {lines.map((line, index) => (
-          <DisplayLine key={index} line={line} />
+          <DisplayLine key={index} line={line} index={index} />
         ))}
       </div>
       <ExportPanel lines={lines} />
@@ -25,14 +25,17 @@ function Display({ lines }: DisplayProps) {
 
 interface iDisplayLineProps {
   line: Compiled;
+  index: number;
 }
 
-function DisplayLine({ line: { line, output } }: iDisplayLineProps) {
+function DisplayLine({ line: { line, output }, index }: iDisplayLineProps) {
   if (output.error) {
     return (
       <>
-        <span>{line}</span>
-        <span className="text-red-500 col-span-2">{output.message}</span>
+        <span>{index + 1}</span>
+        <span className="text-red-500 col-span-2">
+          (Line {line}) - {output.message}
+        </span>
       </>
     );
   }
