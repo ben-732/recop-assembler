@@ -14,13 +14,12 @@ function App() {
   return (
     <div className="h-screen w-screen bg-gray-900 p-4">
       <h1 className="text-white font-bold text-xl">ReCOP Assembler</h1>
-
-      <div className="grid grid-cols-[200px_auto] mb-4">
-        <FileExplorer
-          store={store}
-          setEditorState={setEditorState}
-          editorState={editorState}
-        />
+      <FileExplorer
+        store={store}
+        setEditorState={setEditorState}
+        editorState={editorState}
+      />
+      <div className="max-w-3xl mb-4">
         <Editor value={editorState} setValue={setEditorState} />
       </div>
       <Display lines={compiled} />
