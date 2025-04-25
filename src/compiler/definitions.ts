@@ -1,3 +1,6 @@
+import { Opcode } from "./opcodes";
+
+export const LabelCommands: Opcode[] = ["JMP", "SZ", "PRESENT"];
 export class DefinitionManager {
   public readonly definitions: Map<string, string> = new Map();
   public readonly labels: Map<string, number> = new Map();
@@ -56,20 +59,25 @@ export class DefinitionManager {
       return line;
     }
 
-    if (parts[0].toUpperCase() !== "JMP") {
+    if (!LabelCommands.includes(parts[0].toUpperCase() as Opcode)) {
       return line;
     }
 
-    const label = parts[1].toUpperCase();
+    return parts
+      .map((part, index) => {
+        if (index === 0) {
+          return part;
+        }
 
-    if (this.labels.has(label)) {
-      return line.replace(
-        label,
-        "#" + this.labels.get(label)?.toString(16).padStart(4, "0")
-      );
-    }
+        if (this.labels.has(part)) {
+          return (
+            `#` + this.labels.get(part)?.toString(16).padStart(4, "0") || part
+          );
+        }
 
-    throw new Error(`Undefined label: ${label}`);
+        return part;
+      })
+      .join(" ");
   }
 
   /**
@@ -79,12 +87,11 @@ export class DefinitionManager {
    * @var -> $value
    */
   public replaceDefinitions(line: string): string {
-    let l = line.trim();
-    if (l.startsWith("JMP")) {
-      l = this.replaceLabels(l);
-    }
+    const labelLine = this.replaceLabels(line);
 
-    return l
+    console.log("Label line", labelLine);
+
+    return labelLine
       .split(/\s+/)
       .map((part) => part.trim())
       .map((s) => this.replacePart(s))
