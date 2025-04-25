@@ -9,9 +9,9 @@ interface Props {
 
 function Editor({ value, setValue }: Props) {
   return (
-    <div className="max-w-7xl">
+    <div>
       <CodeMirror
-        height="400px"
+        height="900px"
         theme={dracula}
         extensions={[dracula, asm(), basicSetup()]}
         value={value}

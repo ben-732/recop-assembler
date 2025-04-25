@@ -48,6 +48,11 @@ export class AssemblyLine {
       return;
     }
 
+    if (line.startsWith("--")) {
+      this.definitions.newLabel(line);
+      return;
+    }
+
     const tokens = line
       .split(/\s+/)
       .map((token) => token.trim())

@@ -31,6 +31,8 @@ export function compile(input: string): Compiled[] {
         continue;
       }
 
+      definitions.nextLine();
+
       const command = parseCommand(asmLine.getCommand());
 
       const instruction = new Instruction();

@@ -1,9 +1,6 @@
 import { AddressMode } from "./address-modes";
-import { InstructionParts, shift } from "./instruction";
 
 export type ArgumentType = "RegisterX" | "RegisterZ" | "Number" | "Address";
-
-const opcode = InstructionParts.OP;
 
 export interface Command {
   value: number;

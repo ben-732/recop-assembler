@@ -15,7 +15,7 @@ export const asmLanguage = LRLanguage.define({
         Comment: tags.comment,
         Identifier: tags.definition(tags.propertyName),
         Definition: tags.definitionKeyword,
-        Label: tags.labelName,
+        Label: tags.keyword,
         NumberIdentifier: tags.string,
         AddressIdentifier: tags.className,
         Value: tags.propertyName,

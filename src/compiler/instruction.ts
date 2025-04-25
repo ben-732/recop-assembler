@@ -41,21 +41,7 @@ export class Instruction {
     const shiftedValue = (value << part.shift) >>> 0;
     const masked = (shiftedValue & mask) >>> 0;
 
-    console.log(
-      partKey,
-      value,
-      value.toString(2),
-      mask.toString(2).padStart(32, "0").length
-    );
-    console.log("init:   ", this.value.toString(2).padStart(32, "0"));
-    console.log("value:  ", shiftedValue.toString(2).padStart(32, "0"));
-    console.log("mask:   ", mask.toString(2).padStart(32, "0"));
-
-    console.log("masked: ", masked.toString(2).padStart(32, "0"));
-
     this.value = (masked | this.value) >>> 0;
-
-    console.log("result: ", this.value.toString(2).padStart(32, "0"));
   }
 }
 
