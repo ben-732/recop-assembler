@@ -1,6 +1,7 @@
 import { Instruction, InstructionPartKey } from "./instruction";
 import { AssemblyLine } from "./assembly-line";
 import { parseCommand } from "./opcodes";
+import { DefinitionManager } from "./definitions";
 
 type Line = { value: string; line: number };
 type LineError = { error: true; message: string };
@@ -19,14 +20,22 @@ export function compile(input: string): Compiled[] {
 
   const instructions: Compiled[] = [];
 
+  const definitions = new DefinitionManager();
+
   for (const line of lines) {
     try {
-      const asmLine = new AssemblyLine(line.value);
+      const asmLine = new AssemblyLine(line.value, definitions);
       // console.log(getOpCode(parts[0].toUpperCase()));
+
+      if (asmLine.parts.length === 0) {
+        continue;
+      }
 
       const command = parseCommand(asmLine.getCommand());
 
-      const instruction = new Instruction(command.value);
+      const instruction = new Instruction();
+
+      instruction.setPart(InstructionPartKey.OpCode, command.value);
 
       const parts = asmLine.parseArguments(command);
 

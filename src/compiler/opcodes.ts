@@ -26,10 +26,6 @@ export function parseCommand(value: string): Command {
   return opcode;
 }
 
-function shiftCode(value: number) {
-  return shift(opcode, value);
-}
-
 export const opcodes = [
   "LDR",
   "STR",
@@ -58,7 +54,7 @@ export type Opcode = (typeof opcodes)[number];
 
 export const commands = {
   ["AND"]: {
-    value: shiftCode(0b001000),
+    value: 0b001000,
     modes: {
       [AddressMode.Register]: ["RegisterZ", "RegisterZ", "RegisterX"],
       [AddressMode.Immediate]: ["RegisterZ", "RegisterX", "Number"],
@@ -66,7 +62,7 @@ export const commands = {
   },
 
   ["OR"]: {
-    value: shiftCode(0b001100),
+    value: 0b001100,
     modes: {
       [AddressMode.Register]: ["RegisterZ", "RegisterZ", "RegisterX"],
       [AddressMode.Immediate]: ["RegisterZ", "RegisterX", "Number"],
@@ -74,7 +70,7 @@ export const commands = {
   },
 
   ["ADD"]: {
-    value: shiftCode(0b111000),
+    value: 0b111000,
     modes: {
       [AddressMode.Register]: ["RegisterZ", "RegisterZ", "RegisterX"],
       [AddressMode.Immediate]: ["RegisterZ", "RegisterX", "Number"],
@@ -82,21 +78,21 @@ export const commands = {
   },
 
   ["SUBV"]: {
-    value: shiftCode(0b000011),
+    value: 0b000011,
     modes: {
       [AddressMode.Immediate]: ["RegisterZ", "RegisterX", "Number"],
     },
   },
 
   ["SUB"]: {
-    value: shiftCode(0b000100),
+    value: 0b000100,
     modes: {
       [AddressMode.Immediate]: ["RegisterZ", "Number"],
     },
   },
 
   ["LDR"]: {
-    value: shiftCode(0b000000),
+    value: 0b000000,
     modes: {
       [AddressMode.Immediate]: ["RegisterZ", "Number"],
       [AddressMode.Register]: ["RegisterZ", "RegisterX"],
@@ -105,7 +101,7 @@ export const commands = {
   },
 
   ["STR"]: {
-    value: shiftCode(0b000010),
+    value: 0b000010,
     modes: {
       [AddressMode.Immediate]: ["RegisterZ", "Number"],
       [AddressMode.Register]: ["RegisterZ", "RegisterX"],
@@ -114,7 +110,7 @@ export const commands = {
   },
 
   ["JMP"]: {
-    value: shiftCode(0b011000),
+    value: 0b011000,
     modes: {
       [AddressMode.Immediate]: ["Number"],
       [AddressMode.Direct]: ["RegisterX"],
@@ -122,14 +118,14 @@ export const commands = {
   },
 
   ["PRESENT"]: {
-    value: shiftCode(0b011100),
+    value: 0b011100,
     modes: {
       [AddressMode.Immediate]: ["RegisterZ", "Number"],
     },
   },
 
   ["DATACALL"]: {
-    value: shiftCode(0b101000),
+    value: 0b101000,
     modes: {
       [AddressMode.Register]: ["RegisterX"],
       [AddressMode.Immediate]: ["RegisterX", "Number"],
@@ -137,84 +133,84 @@ export const commands = {
   },
 
   ["SZ"]: {
-    value: shiftCode(0b010100),
+    value: 0b010100,
     modes: {
       [AddressMode.Immediate]: ["Number"],
     },
   },
 
   ["CLFZ"]: {
-    value: shiftCode(0b010000),
+    value: 0b010000,
     modes: {
       [AddressMode.Inherent]: [],
     },
   },
 
   ["CER"]: {
-    value: shiftCode(0b111100),
+    value: 0b111100,
     modes: {
       [AddressMode.Inherent]: [],
     },
   },
 
   ["CEOT"]: {
-    value: shiftCode(0b111110),
+    value: 0b111110,
     modes: {
       [AddressMode.Inherent]: [],
     },
   },
 
   ["SEOT"]: {
-    value: shiftCode(0b111111),
+    value: 0b111111,
     modes: {
       [AddressMode.Inherent]: [],
     },
   },
 
   ["LER"]: {
-    value: shiftCode(0b110110),
+    value: 0b110110,
     modes: {
       [AddressMode.Register]: ["RegisterZ"],
     },
   },
 
   ["SSVOP"]: {
-    value: shiftCode(0b111011),
+    value: 0b111011,
     modes: {
       [AddressMode.Register]: ["RegisterX"],
     },
   },
 
   ["LSIP"]: {
-    value: shiftCode(0b110111),
+    value: 0b110111,
     modes: {
       [AddressMode.Register]: ["RegisterZ"],
     },
   },
 
   ["SSOP"]: {
-    value: shiftCode(0b111010),
+    value: 0b111010,
     modes: {
       [AddressMode.Register]: ["RegisterX"],
     },
   },
 
   ["NOOP"]: {
-    value: shiftCode(0b110100),
+    value: 0b110100,
     modes: {
       [AddressMode.Inherent]: [],
     },
   },
 
   ["MAX"]: {
-    value: shiftCode(0b011110),
+    value: 0b011110,
     modes: {
       [AddressMode.Immediate]: ["RegisterZ", "Number"],
     },
   },
 
   ["STRPC"]: {
-    value: shiftCode(0b011101),
+    value: 0b011101,
     modes: {
       [AddressMode.Direct]: ["Address"], // `$address`
     },

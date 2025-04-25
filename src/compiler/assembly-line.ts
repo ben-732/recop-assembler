@@ -1,4 +1,5 @@
 import { AddressMode, AddressModes } from "./address-modes";
+import { DefinitionManager } from "./definitions";
 import { InstructionPartKey } from "./instruction";
 import { ArgumentType, Command } from "./opcodes";
 
@@ -14,7 +15,7 @@ export type LinePart = {
 const parts = [
   {
     type: "Register",
-    regex: /^R([0-9]+)$/,
+    regex: /^R(\d+)$/,
   },
   {
     type: "Command",
@@ -33,10 +34,17 @@ const parts = [
 export class AssemblyLine {
   public parts: LinePart[] = [];
 
-  constructor(public raw: string) {
-    const line = this.removeComment(raw).trim();
+  constructor(public raw: string, private definitions: DefinitionManager) {
+    const line = this.definitions.replaceDefinitions(
+      this.removeComment(raw).trim()
+    );
 
     if (line.length === 0) {
+      return;
+    }
+
+    if (line.startsWith(":define")) {
+      this.definitions.newDefinition(line);
       return;
     }
 
@@ -113,9 +121,10 @@ export class AssemblyLine {
         );
       }
 
-      const parsed = parseInt(arg.value, 16);
+      const parsedHex = parseInt(arg.value, 16);
+      const parsedDecimal = parseInt(arg.value, 10);
 
-      if (isNaN(parsed)) {
+      if (isNaN(parsedHex)) {
         throw new Error(
           `Invalid argument value for command ${this.getCommand()}, got ${
             arg.value
@@ -124,18 +133,16 @@ export class AssemblyLine {
       }
 
       if (arg.type === "Register") {
-        if (parsed > 7 || parsed < 0) {
+        if (parsedDecimal > 15 || parsedDecimal < 0) {
           throw new Error(
-            `Invalid register value for command ${this.getCommand()}, got ${
-              arg.value
-            }`
+            `Expected register value to be between 0 and 15, got ${arg.value}`
           );
         }
       }
 
       if (
         (arg.type === "Number" || arg.type === "Address") &&
-        parsed > 0xffff
+        parsedHex > 0xffff
       ) {
         throw new Error(
           `Invalid number value for command ${this.getCommand()}, got ${
@@ -149,38 +156,38 @@ export class AssemblyLine {
         argType === "RegisterX" &&
         result[InstructionPartKey.RegisterX] !== undefined
       ) {
-        if (result[InstructionPartKey.RegisterX] !== parsed) {
+        if (result[InstructionPartKey.RegisterX] !== parsedDecimal) {
           throw new Error(
             `Inconsistent RegisterX values: ${
               result[InstructionPartKey.RegisterX]
-            }, ${parsed}`
+            }, ${parsedDecimal}`
           );
         }
       } else if (
         argType === "RegisterZ" &&
         result[InstructionPartKey.RegisterZ] !== undefined
       ) {
-        if (result[InstructionPartKey.RegisterZ] !== parsed) {
+        if (result[InstructionPartKey.RegisterZ] !== parsedDecimal) {
           throw new Error(
             `Inconsistent RegisterZ values: ${
               result[InstructionPartKey.RegisterZ]
-            }, ${parsed}`
+            }, ${parsedDecimal}`
           );
         }
       }
 
       switch (argType) {
         case "RegisterX":
-          result[InstructionPartKey.RegisterX] = parsed;
+          result[InstructionPartKey.RegisterX] = parsedDecimal;
           break;
         case "RegisterZ":
-          result[InstructionPartKey.RegisterZ] = parsed;
+          result[InstructionPartKey.RegisterZ] = parsedDecimal;
           break;
         case "Number":
-          result[InstructionPartKey.Operand] = parsed;
+          result[InstructionPartKey.Operand] = parsedHex;
           break;
         case "Address":
-          result[InstructionPartKey.Operand] = parsed;
+          result[InstructionPartKey.Operand] = parsedHex;
           break;
         default:
           throw new Error(`Unknown argument type: ${arg.type}`);

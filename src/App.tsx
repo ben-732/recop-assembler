@@ -4,6 +4,7 @@ import Display from "./components/display";
 import { compile } from "./compiler/compiler";
 import { FileStore } from "./editor/explorer/file-store";
 import FileExplorer from "./components/file-explorer";
+import HelpComponent from "./components/help";
 
 function App() {
   const [editorState, setEditorState] = useState("");
@@ -23,6 +24,7 @@ function App() {
         <Editor value={editorState} setValue={setEditorState} />
       </div>
       <Display lines={compiled} />
+      <HelpComponent />
     </div>
   );
 }

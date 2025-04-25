@@ -3,19 +3,38 @@
 }
 
 @top Program {
-  Statement (Statement)*
+  StatementOrDefinition (StatementOrDefinition)*
 }
 
 @tokens {
-  hex_digit { $[0-9a-fA-F] }
   space { " " | "\t" | "\n" }
   comment { ";" ![\n]* }
-  registerNumber { $[0-7] }
+  registerNumber { $[0-1]? $[0-9] }
   label_char { $[\w] }
+  identifier { $[0-9a-zA-Z]+ }
+  number { "#" $[0-9a-fA-F]+ }
+  address { "$" $[0-9a-fA-F]+ }
+  definitionValue { $[0-9a-fA-F]+ }
+}
+
+StatementOrDefinition {
+  Statement | Definition
 }
 
 Statement {
   Command Arg+
+}
+
+DefinitionValue {
+  definitionValue
+}
+
+Definition {
+  ":define" Identifier DefinitionValue
+}
+
+Identifier {
+  identifier
 }
 
 Command {
@@ -24,12 +43,25 @@ Command {
   "LSIP" | "DATACALL" | "DATACALL2" | "MAX"
 }
 
-ArgList {
-  Arg+
+
+Value {
+  Register | Number | Address
+}
+
+NumberIdentifier {
+  "!" Identifier
+}
+
+AddressIdentifier {
+  "@" Identifier
+}
+
+AnyIdentifier {
+  NumberIdentifier | AddressIdentifier
 }
 
 Arg {
-  Register | Number | Operand
+  Value | AnyIdentifier
 }
 
 Register {
@@ -37,11 +69,11 @@ Register {
 }
 
 Number {
-  "#" hex_digit+
+  number
 }
 
-Operand {
- "$" hex_digit+
+Address {
+  address
 }
 
 Label {
