@@ -36,7 +36,7 @@ function App() {
 
   return (
     <>
-      <div className="w-full bg-gray-900 p-4 ">
+      <div className="w-full bg-gray-900 p-4 min-h-screen ">
         <h1 className="text-white font-bold text-xl">ReCOP Assembler</h1>
 
         <div className="grid grid-cols-[auto_auto] gap-12">
