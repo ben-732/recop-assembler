@@ -11,20 +11,38 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
+import { Input } from "./ui/input";
 
 interface DisplayProps {
   lines: Compiled[];
+  startAddress: number;
+  setStartAddress: (startAddress: number) => void;
 }
 
-function Display({ lines }: DisplayProps) {
+function Display({ lines, startAddress, setStartAddress }: DisplayProps) {
   return (
-    <Card className="max-w-max">
+    <Card className="max-w-xl">
       <CardHeader>
-        <CardTitle>Preview</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          Output
+          <div className="flex-grow"></div>
+          <Input
+            className="w-24"
+            placeholder="Start $0"
+            type="number"
+            value={startAddress}
+            onChange={(e) => {
+              const value = parseInt(e.target.value, 10);
+              if (!isNaN(value)) {
+                setStartAddress(value);
+              }
+            }}
+          />
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-[auto_auto_auto] max-w-max col-gap-8 font-mono text-sm text-gray-400 ">
-          <h3 className="font-bold mr-8 text-white">#</h3>
+          <h3 className="font-bold mr-12 text-white">#</h3>
           <h3 className="font-bold mr-24 text-white">Hex</h3>
           <h3 className="font-bold text-white">Binary</h3>
           {lines.map((line, index) => (
@@ -58,7 +76,7 @@ function DisplayLine({ line: { line, output }, index }: iDisplayLineProps) {
 
   return (
     <div className="grid grid-cols-subgrid col-span-3 hover:text-slate-100 ">
-      <span>{index + 1}</span>
+      <span>0x{output.address.toString(16).padStart(2, "0")}</span>
       <span>{output.toHexString()}</span>
       <span>{output.toBinaryString()}</span>
     </div>

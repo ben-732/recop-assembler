@@ -6,7 +6,9 @@
  */
 export class Instruction {
   public readonly error = false;
-  constructor(private value: number = 0) {}
+  private value: number = 0;
+
+  constructor(public readonly address: number) {}
 
   toHexString(pretty = true): string {
     const str = this.value.toString(16).padStart(2, "0");

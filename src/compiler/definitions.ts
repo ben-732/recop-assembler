@@ -1,7 +1,8 @@
 export class DefinitionManager {
   public readonly definitions: Map<string, string> = new Map();
   public readonly labels: Map<string, number> = new Map();
-  private currentLine: number = 0;
+
+  constructor(private currentAddress = 0) {}
 
   newDefinition(line: string) {
     const parts = line.split(/\s+/).map((part) => part.trim());
@@ -45,7 +46,7 @@ export class DefinitionManager {
       throw new Error(`Duplicate label: ${name}`);
     }
 
-    this.labels.set(name, this.currentLine);
+    this.labels.set(name, this.currentAddress);
   }
 
   public replaceLabels(line: string): string {
@@ -108,10 +109,10 @@ export class DefinitionManager {
   }
 
   nextLine() {
-    this.currentLine++;
+    return this.currentAddress++;
   }
 
-  getLine() {
-    return this.currentLine;
+  getAddress() {
+    return this.currentAddress;
   }
 }

@@ -3,10 +3,10 @@ import { Card, CardContent } from "./ui/card";
 
 function HelpComponent() {
   return (
-    <Card className="max-w-max mt-8">
-      <CardContent>
+    <Card className="max-w-xl mt-8">
+      <CardContent className="text-sm">
         <h1 className="text-md font-medium">Variable Syntax</h1>
-        <ul className="text-sm list-disc ml-6 mt-2">
+        <ul className="list-disc ml-6 mt-2">
           <li>
             Define:{" "}
             <Code>

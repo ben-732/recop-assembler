@@ -5,10 +5,11 @@ import { DefinitionManager } from "./definitions";
 
 type Line = { value: string; line: number };
 type LineError = { error: true; message: string };
-type InstructionOrError = (Instruction & { error: false }) | LineError;
+
+type InstructionOrError = Instruction | LineError;
 export type Compiled = { line: number; output: InstructionOrError };
 
-export function compile(input: string): Compiled[] {
+export function compile(input: string, startAddress = 0): Compiled[] {
   const lines = input
     .split("\n")
     .map<Line>((line, i) => ({
@@ -20,7 +21,7 @@ export function compile(input: string): Compiled[] {
 
   const instructions: Compiled[] = [];
 
-  const definitions = new DefinitionManager();
+  const definitions = new DefinitionManager(startAddress);
 
   for (const line of lines) {
     try {
@@ -31,11 +32,11 @@ export function compile(input: string): Compiled[] {
         continue;
       }
 
-      definitions.nextLine();
+      const addr = definitions.nextLine();
 
       const command = parseCommand(asmLine.getCommand());
 
-      const instruction = new Instruction();
+      const instruction = new Instruction(addr);
 
       instruction.setPart(InstructionPartKey.OpCode, command.value);
 
