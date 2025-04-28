@@ -32,4 +32,8 @@ export class Exporter {
     URL.revokeObjectURL(url);
     a.remove();
   }
+
+  allowsErrors(format: ExportFormat): boolean {
+    return this.formats[format].allowErrors === true;
+  }
 }

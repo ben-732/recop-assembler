@@ -112,7 +112,9 @@ function ExportPanel({ lines, raw: editorState }: iExportPanelProps) {
           .filter((f) => isNaN(Number(f[0])))
           .map((format) => (
             <Button
-              disabled={!canExport}
+              disabled={
+                !canExport && !exporter.allowsErrors(format[1] as ExportFormat)
+              }
               key={format[0]}
               className="cursor-pointer"
               onClick={() =>
