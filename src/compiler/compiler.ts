@@ -10,18 +10,15 @@ type InstructionOrError = Instruction | LineError;
 export type Compiled = { line: number; output: InstructionOrError };
 
 export function compile(input: string, startAddress = 0): Compiled[] {
-  const lines = input
-    .split("\n")
-    .map<Line>((line, i) => ({
-      error: false,
-      line: i + 1,
-      value: line.trim(),
-    }))
-    .filter((line) => line.value && line.value.length > 0);
+  const definitions = new DefinitionManager(startAddress);
+
+  const rawLines = input.split("\n").filter((line) => line && line.length > 0);
+  const lines = definitions.preprocess(rawLines).map<Line>((line, i) => ({
+    line: i + 1,
+    value: line.trim(),
+  }));
 
   const instructions: Compiled[] = [];
-
-  const definitions = new DefinitionManager(startAddress);
 
   for (const line of lines) {
     try {
@@ -32,7 +29,7 @@ export function compile(input: string, startAddress = 0): Compiled[] {
         continue;
       }
 
-      const addr = definitions.nextLine();
+      const addr = definitions.nextAddress();
 
       const command = parseCommand(asmLine.getCommand());
 

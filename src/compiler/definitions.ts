@@ -7,6 +7,37 @@ export class DefinitionManager {
 
   constructor(private currentAddress = 0) {}
 
+  /**
+   * Adds definitions and labels, filters out empty lines
+   *
+   * @returns
+   */
+  public preprocess(lines: string[]) {
+    const output: string[] = [];
+
+    for (const line of lines) {
+      const isDefinition = line.startsWith(":define");
+      const isLabel = line.startsWith("--");
+
+      if (!isDefinition && !isLabel) {
+        this.nextAddress();
+        output.push(line);
+        continue;
+      }
+
+      if (isDefinition) {
+        this.newDefinition(line);
+      }
+
+      if (isLabel) {
+        this.newLabel(line);
+      }
+    }
+
+    this.resetAddress();
+    return output;
+  }
+
   newDefinition(line: string) {
     const parts = line.split(/\s+/).map((part) => part.trim());
 
@@ -115,11 +146,17 @@ export class DefinitionManager {
     }
   }
 
-  nextLine() {
+  public nextAddress() {
     return this.currentAddress++;
   }
 
-  getAddress() {
+  public getAddress() {
     return this.currentAddress;
+  }
+
+  public resetAddress() {
+    const old = this.currentAddress;
+    this.currentAddress = 0;
+    return old;
   }
 }

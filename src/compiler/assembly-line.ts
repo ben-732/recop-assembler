@@ -49,7 +49,6 @@ export class AssemblyLine {
     }
 
     if (line.startsWith("--")) {
-      this.definitions.newLabel(line);
       return;
     }
 
