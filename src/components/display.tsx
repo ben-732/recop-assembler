@@ -1,7 +1,7 @@
 import { Compiled } from "@/compiler/compiler";
 import { Button } from "./ui/button";
 import { Exporter, ExportFormat } from "@/exporter/exporter";
-import { DownloadIcon } from "lucide-react";
+import { DownloadIcon, ExternalLinkIcon } from "lucide-react";
 import { Instruction } from "@/compiler/instruction";
 import { useMemo } from "react";
 import {
@@ -12,6 +12,7 @@ import {
   CardTitle,
 } from "./ui/card";
 import { Input } from "./ui/input";
+import { ExportMethod } from "@/exporter/format";
 
 interface DisplayProps {
   lines: Compiled[];
@@ -110,24 +111,30 @@ function ExportPanel({ lines, raw: editorState }: iExportPanelProps) {
       <div className="mt-2 flex gap-2">
         {Object.entries(ExportFormat)
           .filter((f) => isNaN(Number(f[0])))
-          .map((format) => (
-            <Button
-              disabled={
-                !canExport && !exporter.allowsErrors(format[1] as ExportFormat)
-              }
-              key={format[0]}
-              className="cursor-pointer"
-              onClick={() =>
-                exporter.export(
-                  format[1] as ExportFormat,
-                  instructions,
-                  editorState
-                )
-              }
-            >
-              <DownloadIcon className="" />.{format[0]}
-            </Button>
-          ))}
+          .map((format) => {
+            const f = exporter.get(format[1] as ExportFormat);
+            return (
+              <Button
+                disabled={!canExport && !f.allowErrors}
+                key={format[0]}
+                className="cursor-pointer"
+                onClick={() =>
+                  exporter.export(
+                    format[1] as ExportFormat,
+                    instructions,
+                    editorState
+                  )
+                }
+              >
+                {f.method === ExportMethod.NewTab ? (
+                  <ExternalLinkIcon className="" />
+                ) : (
+                  <DownloadIcon className="" />
+                )}
+                {f.name}
+              </Button>
+            );
+          })}
       </div>
     </div>
   );
