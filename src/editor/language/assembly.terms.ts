@@ -14,4 +14,5 @@ export const
   Identifier = 12,
   AddressIdentifier = 13,
   Definition = 14,
-  DefinitionValue = 15
+  DefinitionValue = 15,
+  Label = 16
