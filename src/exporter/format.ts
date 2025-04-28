@@ -5,5 +5,5 @@ export interface IExportFormat {
   extension: string;
   mimeType: string;
 
-  export: (lines: Instruction[]) => string;
+  export: (lines: Instruction[], raw: string) => string;
 }

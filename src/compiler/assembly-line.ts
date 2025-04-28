@@ -35,20 +35,9 @@ export class AssemblyLine {
   public parts: LinePart[] = [];
 
   constructor(public raw: string, private definitions: DefinitionManager) {
-    const line = this.definitions.replaceDefinitions(
-      this.removeComment(raw).trim()
-    );
+    const line = this.definitions.replaceDefinitions(raw);
 
     if (line.length === 0) {
-      return;
-    }
-
-    if (line.startsWith(":define")) {
-      this.definitions.newDefinition(line);
-      return;
-    }
-
-    if (line.startsWith("--")) {
       return;
     }
 
@@ -70,11 +59,6 @@ export class AssemblyLine {
         throw new Error(`Invalid token: ${token}`);
       }
     });
-  }
-
-  private removeComment(line: string): string {
-    const commentIndex = line.indexOf(";");
-    return commentIndex !== -1 ? line.slice(0, commentIndex) : line;
   }
 
   public getCommand(): string {

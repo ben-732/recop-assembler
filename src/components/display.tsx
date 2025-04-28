@@ -17,9 +17,15 @@ interface DisplayProps {
   lines: Compiled[];
   startAddress: number;
   setStartAddress: (startAddress: number) => void;
+  raw: string;
 }
 
-function Display({ lines, startAddress, setStartAddress }: DisplayProps) {
+function Display({
+  lines,
+  startAddress,
+  setStartAddress,
+  raw: editorState,
+}: DisplayProps) {
   return (
     <Card className="max-w-xl">
       <CardHeader>
@@ -51,7 +57,7 @@ function Display({ lines, startAddress, setStartAddress }: DisplayProps) {
         </div>
       </CardContent>
       <CardFooter>
-        <ExportPanel lines={lines} />
+        <ExportPanel lines={lines} raw={editorState} />
       </CardFooter>
     </Card>
   );
@@ -85,9 +91,10 @@ function DisplayLine({ line: { line, output }, index }: iDisplayLineProps) {
 
 interface iExportPanelProps {
   lines: Compiled[];
+  raw: string;
 }
 
-function ExportPanel({ lines }: iExportPanelProps) {
+function ExportPanel({ lines, raw: editorState }: iExportPanelProps) {
   const exporter = new Exporter();
 
   const instructions: Instruction[] = useMemo(
@@ -109,7 +116,11 @@ function ExportPanel({ lines }: iExportPanelProps) {
               key={format[0]}
               className="cursor-pointer"
               onClick={() =>
-                exporter.export(format[1] as ExportFormat, instructions)
+                exporter.export(
+                  format[1] as ExportFormat,
+                  instructions,
+                  editorState
+                )
               }
             >
               <DownloadIcon className="" />.{format[0]}

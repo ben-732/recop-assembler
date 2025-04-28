@@ -7,7 +7,7 @@ export class MifFormat implements IExportFormat {
   mimeType = "text/plain";
 
   export(lines: Instruction[]): string {
-    return `DEPTH = 1024;\nWIDTH = 32;\n\nADDRESS_RADIX = HEX;\nDATA_RADIX = HEX;\n\nCONTENT BEGIN\n${lines
+    return `DEPTH = 1024;\nWIDTH = 32;\n\nADDRESS_RADIX = HEX;\nDATA_RADIX = HEX;\n\nCONTENT BEGIN\n\t[00..3FF]: FFFFFFFF;\n${lines
       .map(
         (instruction) =>
           `\t${instruction.address

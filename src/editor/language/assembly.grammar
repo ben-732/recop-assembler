@@ -22,7 +22,7 @@ StatementOrDefinition {
 }
 
 Statement {
-  Command Arg+
+  Command Arg?
 }
 
 DefinitionValue {

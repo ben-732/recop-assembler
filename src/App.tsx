@@ -6,6 +6,7 @@ import { FileStore } from "./editor/explorer/file-store";
 import FileExplorer from "./components/file-explorer";
 import HelpComponent from "./components/help";
 import DefinitionsComponent from "./components/definitions.component";
+import { combineStrings } from "./utils/join-string";
 
 const START_ADDRESS_KEY = "start-address";
 const DEFS_KEY = "defs";
@@ -20,10 +21,16 @@ function App() {
     localStorage.getItem(DEFS_KEY) ?? ""
   );
 
+  const joined = useMemo(
+    () => combineStrings(defs, editorState),
+    [defs, editorState]
+  );
+
   const store = useMemo(() => new FileStore(true), []);
+
   const compiled = useMemo(
-    () => compile(defs + "\n" + editorState, startAddress),
-    [defs, editorState, startAddress]
+    () => compile(joined, startAddress),
+    [joined, startAddress]
   );
 
   useEffect(() => {
@@ -48,6 +55,7 @@ function App() {
               lines={compiled}
               startAddress={startAddress}
               setStartAddress={setStartAddress}
+              raw={joined}
             />
             <HelpComponent />
             <DefinitionsComponent defs={defs} setDefs={setDefs} />

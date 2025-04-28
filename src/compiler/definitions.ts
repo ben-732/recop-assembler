@@ -1,41 +1,21 @@
 import { Opcode } from "./opcodes";
 
 export const LabelCommands: Opcode[] = ["JMP", "SZ", "PRESENT"];
+
+export class DefinitionError extends Error {
+  constructor(message: string, public readonly line: string) {
+    super(message);
+    this.name = "DefinitionError";
+  }
+}
+
 export class DefinitionManager {
   public readonly definitions: Map<string, string> = new Map();
   public readonly labels: Map<string, number> = new Map();
+  private currentAddress = this.defaultAddress;
 
-  constructor(private currentAddress = 0) {}
-
-  /**
-   * Adds definitions and labels, filters out empty lines
-   *
-   * @returns
-   */
-  public preprocess(lines: string[]) {
-    const output: string[] = [];
-
-    for (const line of lines) {
-      const isDefinition = line.startsWith(":define");
-      const isLabel = line.startsWith("--");
-
-      if (!isDefinition && !isLabel) {
-        this.nextAddress();
-        output.push(line);
-        continue;
-      }
-
-      if (isDefinition) {
-        this.newDefinition(line);
-      }
-
-      if (isLabel) {
-        this.newLabel(line);
-      }
-    }
-
-    this.resetAddress();
-    return output;
+  constructor(private readonly defaultAddress = 0) {
+    this.currentAddress = this.defaultAddress;
   }
 
   newDefinition(line: string) {
@@ -120,8 +100,6 @@ export class DefinitionManager {
   public replaceDefinitions(line: string): string {
     const labelLine = this.replaceLabels(line);
 
-    console.log("Label line", labelLine);
-
     return labelLine
       .split(/\s+/)
       .map((part) => part.trim())
@@ -156,7 +134,7 @@ export class DefinitionManager {
 
   public resetAddress() {
     const old = this.currentAddress;
-    this.currentAddress = 0;
+    this.currentAddress = this.defaultAddress;
     return old;
   }
 }
