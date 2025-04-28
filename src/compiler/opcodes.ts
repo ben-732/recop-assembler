@@ -44,7 +44,6 @@ export const opcodes = [
   "SSOP",
   "LSIP",
   "DATACALL",
-  "DATACALL2",
   "MAX",
   "STRPC",
 ] as const;
@@ -126,11 +125,6 @@ export const commands = {
     value: 0b101000,
     modes: {
       [AddressMode.Register]: ["RegisterX"],
-    },
-  },
-  ["DATACALL2"]: {
-    value: 0b101001,
-    modes: {
       [AddressMode.Immediate]: ["RegisterX", "Number"],
     },
   },
